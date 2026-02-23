@@ -62,7 +62,28 @@ List<Attendance> sampleAttendance = [
   Attendance(
     id: 3,
     clientId: 3,
-    attendanceDate: DateTime.now(),
-    checkInTime: DateTime.now().subtract(const Duration(hours: 3, minutes: 30)),
+    attendanceDate: DateTime.now().subtract(const Duration(days: 1)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
+  ),
+  Attendance(
+    id: 4,
+    clientId: 1,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 2)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 2, hours: 1)),
+  ),
+  Attendance(
+    id: 5,
+    clientId: 2,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 3)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 3, hours: 4)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 3, hours: 2)),
+  ),
+  Attendance(
+    id: 6,
+    clientId: 3,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 4)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 4, hours: 2)),
   ),
 ];

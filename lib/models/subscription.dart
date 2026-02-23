@@ -41,10 +41,7 @@ class ClientSubscription {
   final int planId;
   final DateTime startDate;
   final DateTime endDate;
-  final String status; // 'Active', 'Expired', 'Cancelled', 'Pending'
-  final double? amountPaid;
-  final DateTime? paymentDate;
-  final String? paymentMethod;
+  final String status; // 'Active', 'Expired', 'Paused'
 
   ClientSubscription({
     required this.id,
@@ -53,9 +50,6 @@ class ClientSubscription {
     required this.startDate,
     required this.endDate,
     required this.status,
-    this.amountPaid,
-    this.paymentDate,
-    this.paymentMethod,
   });
 
   int get daysRemaining {
@@ -78,8 +72,6 @@ const List<PlanType> samplePlanTypes = [
   PlanType(id: 1, name: 'Basic'),
   PlanType(id: 2, name: 'Standard'),
   PlanType(id: 3, name: 'Premium'),
-  PlanType(id: 4, name: 'Student'),
-  PlanType(id: 5, name: 'Corporate'),
 ];
 
 const List<SubscriptionPlan> samplePlans = [
@@ -104,7 +96,7 @@ const List<SubscriptionPlan> samplePlans = [
     durationInMonths: 3,
     price: 4000,
     isCurrentlyOffered: true,
-    description: 'Save 11% with quarterly payment',
+    description: 'Save with quarterly payment',
     benefits: [
       'Gym access 6am-10pm',
       'Locker room access',
@@ -124,7 +116,6 @@ const List<SubscriptionPlan> samplePlans = [
       'Gym access 5am-11pm',
       'Group classes included',
       'Locker with towel service',
-      'Free protein shake monthly',
     ],
   ),
   SubscriptionPlan(
@@ -134,12 +125,11 @@ const List<SubscriptionPlan> samplePlans = [
     durationInMonths: 12,
     price: 24000,
     isCurrentlyOffered: true,
-    description: 'Best value - 20% savings',
+    description: 'Best value annual plan',
     benefits: [
       '24/7 gym access',
       'Unlimited group classes',
       'Premium locker with towel',
-      'Monthly nutrition consult',
       '2 guest passes monthly',
     ],
   ),
@@ -155,9 +145,7 @@ const List<SubscriptionPlan> samplePlans = [
       '24/7 gym access',
       'Unlimited classes',
       'Personal training (2x/month)',
-      'Spa & recovery area',
       'Nutrition planning',
-      '4 guest passes monthly',
     ],
   ),
 ];
@@ -170,9 +158,6 @@ List<ClientSubscription> sampleSubscriptions = [
     startDate: DateTime.now().subtract(const Duration(days: 45)),
     endDate: DateTime.now().add(const Duration(days: 15)),
     status: 'Active',
-    amountPaid: 2500,
-    paymentDate: DateTime.now().subtract(const Duration(days: 15)),
-    paymentMethod: 'Credit Card',
   ),
   ClientSubscription(
     id: 2,
@@ -181,9 +166,6 @@ List<ClientSubscription> sampleSubscriptions = [
     startDate: DateTime.now().subtract(const Duration(days: 30)),
     endDate: DateTime.now().add(const Duration(days: 335)),
     status: 'Active',
-    amountPaid: 24000,
-    paymentDate: DateTime.now().subtract(const Duration(days: 30)),
-    paymentMethod: 'Bank Transfer',
   ),
   ClientSubscription(
     id: 3,
@@ -192,19 +174,21 @@ List<ClientSubscription> sampleSubscriptions = [
     startDate: DateTime.now().subtract(const Duration(days: 60)),
     endDate: DateTime.now().subtract(const Duration(days: 30)),
     status: 'Expired',
-    amountPaid: 1500,
-    paymentDate: DateTime.now().subtract(const Duration(days: 60)),
-    paymentMethod: 'Cash',
   ),
   ClientSubscription(
     id: 4,
-    clientId: 1,
-    planId: 1,
-    startDate: DateTime.now().subtract(const Duration(days: 120)),
-    endDate: DateTime.now().subtract(const Duration(days: 90)),
-    status: 'Expired',
-    amountPaid: 1500,
-    paymentDate: DateTime.now().subtract(const Duration(days: 120)),
-    paymentMethod: 'Cash',
+    clientId: 4,
+    planId: 2,
+    startDate: DateTime.now().subtract(const Duration(days: 10)),
+    endDate: DateTime.now().add(const Duration(days: 20)),
+    status: 'Active',
+  ),
+  ClientSubscription(
+    id: 5,
+    clientId: 5,
+    planId: 5,
+    startDate: DateTime.now().subtract(const Duration(days: 90)),
+    endDate: DateTime.now().add(const Duration(days: 275)),
+    status: 'Active',
   ),
 ];

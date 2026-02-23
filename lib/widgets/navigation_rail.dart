@@ -15,7 +15,7 @@ class CustomNavigationRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120, // Increased width to accommodate longer text
+      width: 120,
       decoration: const BoxDecoration(
         color: AppColors.black,
         borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
@@ -53,9 +53,8 @@ class CustomNavigationRail extends StatelessWidget {
                   children: [
                     _buildNavItem(0, Iconsax.home, 'Dashboard'),
                     _buildNavItem(1, Iconsax.people, 'Clients'),
-                    _buildNavItem(2, Iconsax.calendar_tick, 'Attendance'),
-                    _buildNavItem(3, Iconsax.activity, 'Goals'),
-                    _buildNavItem(4, Iconsax.ticket, 'Subscriptions'),
+                    _buildNavItem(2, Iconsax.activity, 'Goals'),
+                    _buildNavItem(3, Iconsax.ticket, 'Subscriptions'),
                   ],
                 ),
               ),
@@ -63,7 +62,7 @@ class CustomNavigationRail extends StatelessWidget {
               // Logout at bottom
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: _buildNavItem(5, Iconsax.logout, 'Logout', isLogout: true),
+                child: _buildNavItem(4, Iconsax.logout, 'Logout', isLogout: true),
               ),
             ],
           ),
@@ -109,7 +108,6 @@ class CustomNavigationRail extends StatelessWidget {
                   size: 22,
                 ),
                 const SizedBox(height: 2),
-                // Use FittedBox to ensure text scales down if needed
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(

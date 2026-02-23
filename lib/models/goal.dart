@@ -22,10 +22,7 @@ class ClientGoal {
   final int targetDaysPerWeek;
   final DateTime startDate;
   final DateTime? endDate;
-  final String status; // 'Active', 'Completed', 'Paused', 'Abandoned'
-  final double? targetValue;
-  final double? currentValue;
-  final String? unit; // 'kg', 'reps', 'minutes', etc.
+  final String status; // 'Ongoing', 'Completed', 'Cancelled'
 
   ClientGoal({
     required this.id,
@@ -35,24 +32,11 @@ class ClientGoal {
     required this.startDate,
     this.endDate,
     required this.status,
-    this.targetValue,
-    this.currentValue,
-    this.unit,
   });
-
-  double get progress {
-    if (targetValue == null || currentValue == null) return 0;
-    return (currentValue! / targetValue!).clamp(0.0, 1.0);
-  }
 
   int get daysRemaining {
     if (endDate == null) return 0;
     return endDate!.difference(DateTime.now()).inDays.clamp(0, 9999);
-  }
-
-  String get formattedProgress {
-    if (targetValue == null || currentValue == null) return '--';
-    return '${(progress * 100).toStringAsFixed(0)}%';
   }
 }
 
@@ -61,32 +45,32 @@ List<Goal> sampleGoals = [
   Goal(
     id: 1,
     goalName: 'Weight Loss',
-    goalDescription: 'Reduce body weight to target',
+    goalDescription: 'Reduce body weight and achieve healthy BMI',
     icon: Iconsax.weight,
   ),
   Goal(
     id: 2,
     goalName: 'Muscle Gain',
-    goalDescription: 'Increase muscle mass',
+    goalDescription: 'Increase muscle mass and strength',
     icon: Iconsax.man,
   ),
   Goal(
     id: 3,
-    goalName: 'Strength Training',
-    goalDescription: 'Improve overall strength',
-    icon: Iconsax.chart,
-  ),
-  Goal(
-    id: 4,
-    goalName: 'Cardio Endurance',
-    goalDescription: 'Improve cardiovascular fitness',
+    goalName: 'Endurance',
+    goalDescription: 'Improve cardiovascular endurance and stamina',
     icon: Iconsax.heart,
   ),
   Goal(
-    id: 5,
+    id: 4,
     goalName: 'Flexibility',
-    goalDescription: 'Improve flexibility and mobility',
+    goalDescription: 'Enhance flexibility and mobility',
     icon: Iconsax.ruler,
+  ),
+  Goal(
+    id: 5,
+    goalName: 'General Fitness',
+    goalDescription: 'Maintain overall health and fitness',
+    icon: Iconsax.activity,
   ),
 ];
 
@@ -94,62 +78,69 @@ List<Goal> sampleGoals = [
 List<ClientGoal> sampleClientGoals = [
   ClientGoal(
     id: 1,
-    clientId: 1, // John Doe
+    clientId: 1,
     goalId: 1,
     targetDaysPerWeek: 4,
     startDate: DateTime.now().subtract(const Duration(days: 30)),
     endDate: DateTime.now().add(const Duration(days: 60)),
-    status: 'Active',
-    targetValue: 70,
-    currentValue: 75,
-    unit: 'kg',
+    status: 'Ongoing',
   ),
   ClientGoal(
     id: 2,
-    clientId: 1, // John Doe
+    clientId: 1,
     goalId: 3,
     targetDaysPerWeek: 3,
     startDate: DateTime.now().subtract(const Duration(days: 15)),
-    endDate: DateTime.now().add(const Duration(days: 45)),
-    status: 'Active',
-    targetValue: 100,
-    currentValue: 80,
-    unit: 'kg bench press',
+    status: 'Ongoing',
   ),
   ClientGoal(
     id: 3,
-    clientId: 2, // Sarah Smith
+    clientId: 2,
     goalId: 2,
     targetDaysPerWeek: 5,
     startDate: DateTime.now().subtract(const Duration(days: 45)),
     endDate: DateTime.now().add(const Duration(days: 15)),
-    status: 'Active',
-    targetValue: 65,
-    currentValue: 62,
-    unit: 'kg',
+    status: 'Ongoing',
   ),
   ClientGoal(
     id: 4,
-    clientId: 2, // Sarah Smith
+    clientId: 2,
     goalId: 4,
     targetDaysPerWeek: 3,
     startDate: DateTime.now().subtract(const Duration(days: 60)),
     endDate: DateTime.now().subtract(const Duration(days: 5)),
     status: 'Completed',
-    targetValue: 30,
-    currentValue: 30,
-    unit: 'min run',
   ),
   ClientGoal(
     id: 5,
-    clientId: 3, // Mike Johnson
+    clientId: 3,
     goalId: 5,
     targetDaysPerWeek: 2,
     startDate: DateTime.now().subtract(const Duration(days: 10)),
-    endDate: DateTime.now().add(const Duration(days: 80)),
-    status: 'Active',
-    targetValue: 20,
-    currentValue: 10,
-    unit: 'cm reach',
+    status: 'Ongoing',
+  ),
+  ClientGoal(
+    id: 6,
+    clientId: 4,
+    goalId: 1,
+    targetDaysPerWeek: 3,
+    startDate: DateTime.now().subtract(const Duration(days: 20)),
+    status: 'Ongoing',
+  ),
+  ClientGoal(
+    id: 7,
+    clientId: 4,
+    goalId: 2,
+    targetDaysPerWeek: 2,
+    startDate: DateTime.now().subtract(const Duration(days: 20)),
+    status: 'Ongoing',
+  ),
+  ClientGoal(
+    id: 8,
+    clientId: 5,
+    goalId: 3,
+    targetDaysPerWeek: 4,
+    startDate: DateTime.now().subtract(const Duration(days: 5)),
+    status: 'Ongoing',
   ),
 ];

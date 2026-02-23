@@ -12,14 +12,13 @@ class AppColors {
   static const Color warning = Color(0xFFFF9800);
   static const Color error = Color(0xFFF44336);
   
-  // Fixed helper method using proper color component access
-  static Color withOpacity(Color color, double opacity) {
-    return Color.fromRGBO(
-      (color.r * 255).round().clamp(0, 255),
-      (color.g * 255).round().clamp(0, 255),
-      (color.b * 255).round().clamp(0, 255),
-      opacity,
-    );
+  // Updated method using withValues (new Flutter syntax)
+  static Color withOpacityColor(Color color, double opacity) {
+    return color.withValues(alpha: opacity);
+  }
+
+  static Color? withOpacity(Color color, double d) {
+    return null;
   }
 }
 
