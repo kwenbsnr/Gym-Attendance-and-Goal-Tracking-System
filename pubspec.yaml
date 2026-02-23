@@ -1,0 +1,35 @@
+name: flutter_application_try_0
+description: AJ Fitness Gym - Client Attendance & Goal Tracking System
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI Enhancements
+  iconsax: ^0.0.8  # Modern icon set
+  google_fonts: ^6.1.0  # Google Fonts
+  flutter_svg: ^2.0.9  # SVG support
+  intl: ^0.18.1  # Date formatting
+  
+  # State Management (we'll use simple setState for now)
+  
+  # Utilities
+  path_provider: ^2.1.1  # File system paths
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  
+  # To add assets later
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
