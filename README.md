@@ -1,5 +1,3 @@
-# flutter_application_try_0
-
 A new Flutter project.
 
 ## Getting Started
