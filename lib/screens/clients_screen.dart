@@ -467,7 +467,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
       if (!matchesSearch) return false;
       
       // Status filter
-      ClientSubscription? sub = sampleSubscriptions.firstWhere(
+      final ClientSubscription sub = sampleSubscriptions.firstWhere(
         (s) => s.clientId == client.id,
         orElse: () => ClientSubscription(
           id: 0,
@@ -575,7 +575,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     Attendance? lastAttendance = clientAttendance.isNotEmpty ? clientAttendance.first : null;
     
     // Get subscription status
-    ClientSubscription? sub = sampleSubscriptions.firstWhere(
+    final ClientSubscription sub = sampleSubscriptions.firstWhere(
       (s) => s.clientId == client.id,
       orElse: () => ClientSubscription(
         id: 0,
@@ -769,7 +769,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     Attendance? lastAttendance = clientAttendance.isNotEmpty ? clientAttendance.first : null;
     
     // Get subscription status
-    ClientSubscription? sub = sampleSubscriptions.firstWhere(
+    final ClientSubscription sub = sampleSubscriptions.firstWhere(
       (s) => s.clientId == client.id,
       orElse: () => ClientSubscription(
         id: 0,
@@ -1294,7 +1294,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
-                          leading: Icon(goal.icon ?? Iconsax.activity, color: AppColors.yellow),
+                          leading: Icon(goal.icon, color: AppColors.yellow),
                           title: Text(goal.goalName),
                           subtitle: Text('${clientGoal.targetDaysPerWeek} days/week • ${clientGoal.status}'),
                           trailing: Container(
@@ -1349,8 +1349,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
       _weightController.text = client.currentWeightKg.toString();
       _emergencyContactController.text = client.emergencyContact;
       _medicalNotesController.text = client.medicalNotes ?? '';
-      _selectedGender = client.gender;
-      _selectedDate = client.dateOfBirth;
+      _selectedGender = client.gender ?? 'Male';
+      _selectedDate = client.dateOfBirth ?? DateTime.now().subtract(const Duration(days: 6570));
     } else {
       // Clear for new client
       _firstNameController.clear();
@@ -1435,7 +1435,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: _selectedGender, // FIXED: Changed from initialValue to value
+                            initialValue: _selectedGender,
                             decoration: const InputDecoration(
                               labelText: 'Gender *',
                               prefixIcon: Icon(Iconsax.man, size: 18),
@@ -1759,7 +1759,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   void _showClientDetails(Client client) {
     // Get client's subscription
-    ClientSubscription? sub = sampleSubscriptions.firstWhere(
+    final ClientSubscription sub = sampleSubscriptions.firstWhere(
       (s) => s.clientId == client.id,
       orElse: () => ClientSubscription(
         id: 0,
@@ -1773,7 +1773,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
     
     SubscriptionPlan? plan;
     if (sub.planId > 0) {
-      plan = samplePlans.firstWhere((p) => p.id == sub.planId);
+      final matching = samplePlans.where((p) => p.id == sub.planId);
+      if (matching.isNotEmpty) {
+        plan = matching.first;
+      }
     }
 
     showDialog(
@@ -1832,12 +1835,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   ),
                   const SizedBox(height: 12),
                   
-                  _buildDetailRow('Gender', client.gender),
-                  _buildDetailRow('Age', '${client.age} years'),
-                  _buildDetailRow('Date of Birth', DateFormat('MMMM d, y').format(client.dateOfBirth)),
-                  _buildDetailRow('Height', '${client.heightCm} cm'),
-                  _buildDetailRow('Weight', '${client.currentWeightKg} kg'),
-                  _buildDetailRow('BMI', '${client.bmi.toStringAsFixed(1)} (${client.bmiCategory})'),
+                  _buildDetailRow('Gender', client.gender ?? 'Not specified'),
+                  _buildDetailRow('Age', client.age != null ? '${client.age} years' : 'N/A'),
+                  _buildDetailRow('Date of Birth', client.dateOfBirth != null ? DateFormat('MMMM d, y').format(client.dateOfBirth!) : 'N/A'),
+                  _buildDetailRow('Height', client.heightCm != null ? '${client.heightCm} cm' : 'N/A'),
+                  _buildDetailRow('Weight', client.currentWeightKg != null ? '${client.currentWeightKg} kg' : 'N/A'),
+                  _buildDetailRow('BMI', client.bmi != null ? '${client.bmi!.toStringAsFixed(1)} (${client.bmiCategory})' : 'N/A'),
                   
                   const SizedBox(height: 16),
                   const Divider(),
@@ -1963,7 +1966,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String? value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1982,7 +1985,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
           ),
           Expanded(
             child: Text(
-              value,
+              value ?? '-',
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: 13,

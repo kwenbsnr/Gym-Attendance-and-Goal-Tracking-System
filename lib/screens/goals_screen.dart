@@ -179,7 +179,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
-                      goal.icon ?? Iconsax.activity,
+                      goal.icon,
                       color: AppColors.yellow,
                       size: 24,
                     ),

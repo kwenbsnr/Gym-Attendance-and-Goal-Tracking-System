@@ -1,11 +1,10 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_application_try_0/utils/constants.dart';
 import 'package:flutter_application_try_0/models/client.dart';
 import 'package:flutter_application_try_0/models/subscription.dart';
+import 'package:flutter_application_try_0/models/plan_type.dart';
 
 class SubscriptionsScreen extends StatefulWidget {
   const SubscriptionsScreen({super.key});
@@ -149,7 +148,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -234,7 +233,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -407,7 +406,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
                   ),
                 ),
                 Text(
-                  plan.planName,
+                  plan.name,
                   style: AppTextStyles.smallText.copyWith(fontSize: 11),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -490,7 +489,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
         color: AppColors.withOpacity(color, 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.withOpacity(color, 0.3)!,
+          color: AppColors.withOpacity(color, 0.3),
           width: 1,
         ),
       ),

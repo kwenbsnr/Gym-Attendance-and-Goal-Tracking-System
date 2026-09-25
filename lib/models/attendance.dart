@@ -4,47 +4,35 @@ class Attendance {
   final int attendanceId;
   final int clientId;
   final DateTime attendanceDate;
-  final TimeOfDay? checkInTime;
-  final TimeOfDay? checkOutTime;
+  final DateTime? checkInTime;
+  final DateTime? checkOutTime;
 
   Attendance({
-    required this.attendanceId,
+    int? id,
+    int? attendanceId,
     required this.clientId,
     required this.attendanceDate,
     this.checkInTime,
     this.checkOutTime,
-  });
+  }) : attendanceId = attendanceId ?? id ?? 0;
 
+  int get id => attendanceId;
   bool get isCheckedIn => checkInTime != null;
   bool get isCheckedOut => checkOutTime != null;
   
   String get formattedCheckInTime {
     if (checkInTime == null) return 'Not checked in';
-    return checkInTime!.format(context);
+    return DateFormat('hh:mm a').format(checkInTime!);
   }
   
   String get formattedCheckOutTime {
     if (checkOutTime == null) return 'Not checked out';
-    return checkOutTime!.format(context);
+    return DateFormat('hh:mm a').format(checkOutTime!);
   }
   
   Duration? get duration {
     if (checkInTime != null && checkOutTime != null) {
-      DateTime checkInDateTime = DateTime(
-        attendanceDate.year,
-        attendanceDate.month,
-        attendanceDate.day,
-        checkInTime!.hour,
-        checkInTime!.minute,
-      );
-      DateTime checkOutDateTime = DateTime(
-        attendanceDate.year,
-        attendanceDate.month,
-        attendanceDate.day,
-        checkOutTime!.hour,
-        checkOutTime!.minute,
-      );
-      return checkOutDateTime.difference(checkInDateTime);
+      return checkOutTime!.difference(checkInTime!);
     }
     return null;
   }
@@ -58,37 +46,91 @@ class Attendance {
   }
 
   Map<String, dynamic> toMap() {
+    String? formatTime(DateTime? dt) {
+      if (dt == null) return null;
+      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+    }
+
     return {
       'attendance_id': attendanceId,
       'client_id': clientId,
       'attendance_date': attendanceDate.toIso8601String(),
-      'check_in_time': checkInTime != null 
-          ? '${checkInTime!.hour.toString().padLeft(2, '0')}:${checkInTime!.minute.toString().padLeft(2, '0')}:00'
-          : null,
-      'check_out_time': checkOutTime != null
-          ? '${checkOutTime!.hour.toString().padLeft(2, '0')}:${checkOutTime!.minute.toString().padLeft(2, '0')}:00'
-          : null,
+      'check_in_time': formatTime(checkInTime),
+      'check_out_time': formatTime(checkOutTime),
     };
   }
 
   factory Attendance.fromMap(Map<String, dynamic> map) {
-    TimeOfDay? parseTime(String? timeStr) {
-      if (timeStr == null) return null;
+    final date = DateTime.parse(map['attendance_date']);
+
+    DateTime? parseDateTimeOrTime(dynamic val, DateTime baseDate) {
+      if (val == null) return null;
+      if (val is DateTime) return val;
+      final timeStr = val.toString();
+      if (timeStr.isEmpty) return null;
+      if (timeStr.contains('T')) {
+        return DateTime.tryParse(timeStr);
+      }
       final parts = timeStr.split(':');
-      return TimeOfDay(
-        hour: int.parse(parts[0]),
-        minute: int.parse(parts[1]),
-      );
+      if (parts.length >= 2) {
+        final h = int.tryParse(parts[0]) ?? 0;
+        final m = int.tryParse(parts[1]) ?? 0;
+        final s = parts.length > 2 ? (int.tryParse(parts[2]) ?? 0) : 0;
+        return DateTime(baseDate.year, baseDate.month, baseDate.day, h, m, s);
+      }
+      return null;
     }
 
     return Attendance(
-      attendanceId: map['attendance_id'],
-      clientId: map['client_id'],
-      attendanceDate: DateTime.parse(map['attendance_date']),
-      checkInTime: parseTime(map['check_in_time']),
-      checkOutTime: parseTime(map['check_out_time']),
+      attendanceId: map['attendance_id'] ?? map['id'] ?? 0,
+      clientId: map['client_id'] ?? 0,
+      attendanceDate: date,
+      checkInTime: parseDateTimeOrTime(map['check_in_time'], date),
+      checkOutTime: parseDateTimeOrTime(map['check_out_time'], date),
     );
   }
-
-  static BuildContext? get context => null;
 }
+
+// Sample data for UI development
+List<Attendance> sampleAttendance = [
+  Attendance(
+    id: 1,
+    clientId: 1,
+    attendanceDate: DateTime.now(),
+    checkInTime: DateTime.now().subtract(const Duration(hours: 2)),
+    checkOutTime: DateTime.now().subtract(const Duration(minutes: 30)),
+  ),
+  Attendance(
+    id: 2,
+    clientId: 2,
+    attendanceDate: DateTime.now(),
+    checkInTime: DateTime.now().subtract(const Duration(hours: 1)),
+  ),
+  Attendance(
+    id: 3,
+    clientId: 3,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 1)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 1, hours: 2)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 1, hours: 1)),
+  ),
+  Attendance(
+    id: 4,
+    clientId: 1,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 2)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 2, hours: 3)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 2, hours: 1)),
+  ),
+  Attendance(
+    id: 5,
+    clientId: 2,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 3)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 3, hours: 4)),
+    checkOutTime: DateTime.now().subtract(const Duration(days: 3, hours: 2)),
+  ),
+  Attendance(
+    id: 6,
+    clientId: 3,
+    attendanceDate: DateTime.now().subtract(const Duration(days: 4)),
+    checkInTime: DateTime.now().subtract(const Duration(days: 4, hours: 2)),
+  ),
+];

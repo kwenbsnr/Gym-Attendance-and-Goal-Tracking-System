@@ -17,8 +17,8 @@ class AppColors {
     return color.withValues(alpha: opacity);
   }
 
-  static Color? withOpacity(Color color, double d) {
-    return null;
+  static Color withOpacity(Color color, double d) {
+    return color.withValues(alpha: d);
   }
 }
 

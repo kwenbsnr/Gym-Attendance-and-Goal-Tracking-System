@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_try_0/repositories/gym_repository.dart';
 import 'package:flutter_application_try_0/models/client.dart';
-import 'package:flutter_application_try_0/models/subscription.dart';
 import 'package:flutter_application_try_0/models/goal.dart';
 
 class TestDatabaseScreen extends StatefulWidget {
@@ -47,7 +46,7 @@ class _TestDatabaseScreenState extends State<TestDatabaseScreen> {
                   child: const Text('Test Subscription'),
                 ),
                 ElevatedButton(
-                  onPressed: _TestGoalOperations,
+                  onPressed: _testGoalOperations,
                   child: const Text('Test Goal'),
                 ),
                 ElevatedButton(
@@ -143,7 +142,7 @@ class _TestDatabaseScreenState extends State<TestDatabaseScreen> {
     }
   }
 
-  Future<void> _TestGoalOperations() async {
+  Future<void> _testGoalOperations() async {
     _setLoading(true);
     try {
       StringBuffer sb = StringBuffer();
@@ -201,7 +200,7 @@ class _TestDatabaseScreenState extends State<TestDatabaseScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
     await _testSubscriptionOperations();
     await Future.delayed(const Duration(milliseconds: 500));
-    await _TestGoalOperations();
+    await _testGoalOperations();
     await Future.delayed(const Duration(milliseconds: 500));
     await _testAttendanceOperations();
   }

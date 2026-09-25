@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_try_0/repositories/client_repository.dart';
+import 'package:flutter_application_try_0/repositories/gym_repository.dart';
 import 'package:flutter_application_try_0/models/client.dart';
 
 class DatabaseProvider extends ChangeNotifier {
-  final ClientRepository _repository = ClientRepository();
+  final GymRepository _repository = GymRepository();
   
   List<Client> _clients = [];
   List<Client> get clients => _clients;
