@@ -86,42 +86,48 @@ class _ClientsScreenState extends State<ClientsScreen> {
   }
 
   Widget _buildAppBar() {
+    final isMobile = MediaQuery.of(context).size.width < 768;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 12 : 16),
       color: AppColors.white,
       child: Row(
         children: [
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Client Management',
-                style: AppTextStyles.heading2,
-              ),
-              Text(
-                'Manage members, attendance, and goals',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Client Management',
+                  style: isMobile ? AppTextStyles.heading3 : AppTextStyles.heading2,
                 ),
-              ),
-            ],
+                Text(
+                  'Manage members & goals',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 12, vertical: isMobile ? 6 : 8),
             decoration: BoxDecoration(
               color: AppColors.lightYellow,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Iconsax.people, color: AppColors.black),
-                const SizedBox(width: 8),
+                Icon(Iconsax.people, color: AppColors.black, size: isMobile ? 16 : 20),
+                const SizedBox(width: 6),
                 Text(
-                  '${sampleClients.length} Total Clients',
-                  style: const TextStyle(
+                  '${sampleClients.length} Clients',
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
+                    fontSize: isMobile ? 12 : 14,
                   ),
                 ),
               ],
@@ -138,12 +144,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
         // Add New Client Button (Floating style)
         ElevatedButton.icon(
           onPressed: () => _showClientForm(),
-          icon: const Icon(Iconsax.user_add),
+          icon: const Icon(Iconsax.user_add, size: 18),
           label: const Text('Add New Client'),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.yellow,
             foregroundColor: AppColors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           ),
         ),
       ],
@@ -162,92 +168,106 @@ class _ClientsScreenState extends State<ClientsScreen> {
     int withActiveSub = sampleSubscriptions.where((s) => s.status == 'Active').length;
     int withGoals = sampleClientGoals.where((g) => g.status == 'Ongoing').length;
 
-    return Row(
-      children: [
-        _buildStatCard(
-          'Total Clients',
-          totalClients.toString(),
-          Iconsax.people,
-          AppColors.yellow,
-        ),
-        const SizedBox(width: 16),
-        _buildStatCard(
-          'Active Today',
-          activeToday.toString(),
-          Iconsax.activity,
-          Colors.green,
-        ),
-        const SizedBox(width: 16),
-        _buildStatCard(
-          'Active Subs',
-          withActiveSub.toString(),
-          Iconsax.ticket,
-          Colors.blue,
-        ),
-        const SizedBox(width: 16),
-        _buildStatCard(
-          'With Goals',
-          withGoals.toString(),
-          Iconsax.note,
-          Colors.orange,
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 650) {
+          return GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.7,
+            children: [
+              _buildStatCardWidget('Total Clients', totalClients.toString(), Iconsax.people, AppColors.yellow),
+              _buildStatCardWidget('Active Today', activeToday.toString(), Iconsax.activity, Colors.green),
+              _buildStatCardWidget('Active Subs', withActiveSub.toString(), Iconsax.ticket, Colors.blue),
+              _buildStatCardWidget('With Goals', withGoals.toString(), Iconsax.note, Colors.orange),
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            _buildStatCard('Total Clients', totalClients.toString(), Iconsax.people, AppColors.yellow),
+            const SizedBox(width: 16),
+            _buildStatCard('Active Today', activeToday.toString(), Iconsax.activity, Colors.green),
+            const SizedBox(width: 16),
+            _buildStatCard('Active Subs', withActiveSub.toString(), Iconsax.ticket, Colors.blue),
+            const SizedBox(width: 16),
+            _buildStatCard('With Goals', withGoals.toString(), Iconsax.note, Colors.orange),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatCardWidget(String label, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(
+                  label,
+                  style: AppTextStyles.caption.copyWith(fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    label,
-                    style: AppTextStyles.caption,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: _buildStatCardWidget(label, value, icon, color),
     );
   }
 
   Widget _buildSearchFilterBar() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(isMobile ? 12 : 16),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
@@ -259,12 +279,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search Field
-          Expanded(
-            flex: 2,
-            child: Container(
+          if (isMobile) ...[
+            // Mobile: Search field on top
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: AppColors.grey,
@@ -277,140 +297,193 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  hintText: 'Search by first name or last name...',
+                  hintText: 'Search client name...',
                   border: InputBorder.none,
-                  prefixIcon: Icon(Iconsax.search_normal, size: 20),
+                  prefixIcon: Icon(Iconsax.search_normal, size: 18),
                 ),
               ),
             ),
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // Filter Options
-          Expanded(
-            child: Row(
-              children: _filterOptions.map((filter) {
-                if (filter == 'Inactive Since') {
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: InkWell(
-                        onTap: () async {
-                          DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate: _selectedInactiveDate ?? DateTime.now(),
-                            firstDate: DateTime(2020),
-                            lastDate: DateTime.now(),
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              _selectedFilter = filter;
-                              _selectedInactiveDate = picked;
-                            });
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: _selectedFilter == filter 
-                                ? AppColors.yellow 
-                                : AppColors.grey,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Iconsax.calendar,
-                                size: 14,
-                                color: _selectedFilter == filter 
-                                    ? AppColors.black 
-                                    : Colors.grey,
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  _selectedInactiveDate != null && _selectedFilter == filter
-                                      ? DateFormat('MMM d').format(_selectedInactiveDate!)
-                                      : filter,
-                                  style: TextStyle(
-                                    color: _selectedFilter == filter 
-                                        ? AppColors.black 
-                                        : Colors.grey.shade700,
-                                    fontSize: 12,
-                                    fontWeight: _selectedFilter == filter 
-                                        ? FontWeight.w600 
-                                        : FontWeight.normal,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+            const SizedBox(height: 12),
+            // Mobile: Horizontal scrolling Filter Chips & View Toggle
+            Row(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _filterOptions.map((filter) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6),
+                          child: _buildFilterChip(filter),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }
-                
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(
-                        filter,
-                        style: TextStyle(
-                          color: _selectedFilter == filter 
-                              ? AppColors.black 
-                              : Colors.grey.shade700,
-                          fontSize: 12,
-                          fontWeight: _selectedFilter == filter 
-                              ? FontWeight.w600 
-                              : FontWeight.normal,
-                        ),
-                      ),
-                      selected: _selectedFilter == filter,
-                      onSelected: (selected) {
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildViewToggleButton(Iconsax.element_3, 'list'),
+                      _buildViewToggleButton(Iconsax.element_4, 'grid'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            // Desktop: Row layout
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextField(
+                      onChanged: (value) {
                         setState(() {
-                          _selectedFilter = filter;
-                          if (filter != 'Inactive Since') {
-                            _selectedInactiveDate = null;
-                          }
+                          _searchQuery = value.toLowerCase();
                         });
                       },
-                      backgroundColor: AppColors.grey,
-                      selectedColor: AppColors.yellow,
-                      checkmarkColor: AppColors.black,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                      decoration: const InputDecoration(
+                        hintText: 'Search by first name or last name...',
+                        border: InputBorder.none,
+                        prefixIcon: Icon(Iconsax.search_normal, size: 20),
                       ),
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-          ),
-          
-          const SizedBox(width: 16),
-          
-          // View Toggle
-          Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppColors.grey,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                _buildViewToggleButton(Iconsax.element_3, 'list'),
-                _buildViewToggleButton(Iconsax.element_4, 'grid'),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 3,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _filterOptions.map((filter) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _buildFilterChip(filter),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.grey,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildViewToggleButton(Iconsax.element_3, 'list'),
+                      _buildViewToggleButton(Iconsax.element_4, 'grid'),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
+          ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String filter) {
+    if (filter == 'Inactive Since') {
+      return InkWell(
+        onTap: () async {
+          DateTime? picked = await showDatePicker(
+            context: context,
+            initialDate: _selectedInactiveDate ?? DateTime.now(),
+            firstDate: DateTime(2020),
+            lastDate: DateTime.now(),
+          );
+          if (picked != null) {
+            setState(() {
+              _selectedFilter = filter;
+              _selectedInactiveDate = picked;
+            });
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: _selectedFilter == filter 
+                ? AppColors.yellow 
+                : AppColors.grey,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Iconsax.calendar,
+                size: 14,
+                color: _selectedFilter == filter 
+                    ? AppColors.black 
+                    : Colors.grey,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _selectedInactiveDate != null && _selectedFilter == filter
+                    ? DateFormat('MMM d').format(_selectedInactiveDate!)
+                    : filter,
+                style: TextStyle(
+                  color: _selectedFilter == filter 
+                      ? AppColors.black 
+                      : Colors.grey.shade700,
+                  fontSize: 12,
+                  fontWeight: _selectedFilter == filter 
+                      ? FontWeight.w600 
+                      : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return FilterChip(
+      label: Text(
+        filter,
+        style: TextStyle(
+          color: _selectedFilter == filter 
+              ? AppColors.black 
+              : Colors.grey.shade700,
+          fontSize: 12,
+          fontWeight: _selectedFilter == filter 
+              ? FontWeight.w600 
+              : FontWeight.normal,
+        ),
+      ),
+      selected: _selectedFilter == filter,
+      onSelected: (selected) {
+        setState(() {
+          _selectedFilter = filter;
+          if (filter != 'Inactive Since') {
+            _selectedInactiveDate = null;
+          }
+        });
+      },
+      backgroundColor: AppColors.grey,
+      selectedColor: AppColors.yellow,
+      checkmarkColor: AppColors.black,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
     );
   }
@@ -450,7 +523,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
       return _buildEmptyState();
     }
 
-    if (_selectedView == 'list') {
+    final isMobile = MediaQuery.of(context).size.width < 768;
+
+    if (_selectedView == 'list' && !isMobile) {
       return _buildTableFormat(filteredClients);
     } else {
       return _buildGridFormat(filteredClients);
@@ -742,18 +817,32 @@ class _ClientsScreenState extends State<ClientsScreen> {
   }
 
   Widget _buildGridFormat(List<Client> clients) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.1,
-      ),
-      itemCount: clients.length,
-      itemBuilder: (context, index) {
-        return _buildClientCard(clients[index]);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 3;
+        double childAspectRatio = 1.1;
+        if (constraints.maxWidth < 650) {
+          crossAxisCount = 1;
+          childAspectRatio = 1.55;
+        } else if (constraints.maxWidth < 1050) {
+          crossAxisCount = 2;
+          childAspectRatio = 1.25;
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: clients.length,
+          itemBuilder: (context, index) {
+            return _buildClientCard(clients[index]);
+          },
+        );
       },
     );
   }
@@ -1194,10 +1283,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Text('Assign Goal to ${client.fullName}'),
-          content: SizedBox(
-            width: 400,
+          content: Container(
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 400),
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Column(
@@ -1275,10 +1366,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Text('${client.fullName}\'s Goals'),
-          content: SizedBox(
-            width: 400,
+          content: Container(
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 450),
             child: clientGoals.isEmpty
                 ? const Center(child: Text('No goals assigned'))
                 : ListView.builder(
@@ -1368,10 +1461,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Text(client == null ? 'Add New Client' : 'Edit Client'),
           content: Container(
-            width: 600,
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 600),
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Form(
               key: _formKey,
@@ -1782,10 +1877,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Text(client.fullName),
           content: Container(
-            width: 500,
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 500),
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: SingleChildScrollView(
               child: Column(

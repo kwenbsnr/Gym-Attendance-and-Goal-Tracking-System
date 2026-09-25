@@ -30,14 +30,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+
     return Scaffold(
+      bottomNavigationBar: isMobile
+          ? NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: _onNavigationItemSelected,
+              backgroundColor: AppColors.white,
+              indicatorColor: AppColors.yellow,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Iconsax.home),
+                  selectedIcon: Icon(Iconsax.home_15, color: AppColors.black),
+                  label: 'Home',
+                ),
+                NavigationDestination(
+                  icon: Icon(Iconsax.people),
+                  selectedIcon: Icon(Iconsax.people5, color: AppColors.black),
+                  label: 'Clients',
+                ),
+                NavigationDestination(
+                  icon: Icon(Iconsax.activity),
+                  selectedIcon: Icon(Iconsax.activity5, color: AppColors.black),
+                  label: 'Goals',
+                ),
+                NavigationDestination(
+                  icon: Icon(Iconsax.ticket),
+                  selectedIcon: Icon(Iconsax.ticket, color: AppColors.black),
+                  label: 'Plans',
+                ),
+                NavigationDestination(
+                  icon: Icon(Iconsax.logout),
+                  selectedIcon: Icon(Iconsax.logout, color: Colors.red),
+                  label: 'Logout',
+                ),
+              ],
+            )
+          : null,
       body: Row(
         children: [
-          // Navigation Rail
-          CustomNavigationRail(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onNavigationItemSelected,
-          ),
+          // Navigation Rail (Desktop / Tablet only)
+          if (!isMobile)
+            CustomNavigationRail(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: _onNavigationItemSelected,
+            ),
           
           // Main Content
           Expanded(
@@ -116,6 +155,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // ============= DASHBOARD CONTENT WITH CHARTS =============
 
   Widget _buildDashboard() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 768;
+
     return Container(
       color: AppColors.grey,
       child: Column(
@@ -126,14 +168,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Dashboard Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(isMobile ? 16 : 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // KPI Summary Cards
                   _buildKPICards(),
                   
-                  const SizedBox(height: 32),
+                  SizedBox(height: isMobile ? 20 : 32),
                   
                   // Charts Row
                   LayoutBuilder(
@@ -142,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         return Column(
                           children: [
                             _buildAttendanceChart(),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
                             _buildGoalParticipationChart(),
                           ],
                         );
@@ -165,7 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     },
                   ),
                   
-                  const SizedBox(height: 32),
+                  SizedBox(height: isMobile ? 20 : 32),
                   
                   // Recent Activity and Expiring Soon
                   LayoutBuilder(
@@ -174,7 +216,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         return Column(
                           children: [
                             _buildRecentCheckIns(),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 20),
                             _buildExpiringSoon(),
                           ],
                         );
@@ -206,42 +248,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildAppBar() {
+    final isMobile = MediaQuery.of(context).size.width < 768;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 12 : 16),
       color: AppColors.white,
       child: Row(
         children: [
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Welcome back, Staff',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Welcome back, Staff',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.grey,
+                  ),
                 ),
-              ),
-              Text(
-                'Dashboard',
-                style: AppTextStyles.heading2,
-              ),
-            ],
+                Text(
+                  'Dashboard',
+                  style: isMobile ? AppTextStyles.heading3 : AppTextStyles.heading2,
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 12, vertical: isMobile ? 6 : 8),
             decoration: BoxDecoration(
               color: AppColors.lightYellow,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Iconsax.calendar, color: AppColors.black),
-                const SizedBox(width: 8),
+                Icon(Iconsax.calendar, color: AppColors.black, size: isMobile ? 16 : 20),
+                const SizedBox(width: 6),
                 Text(
-                  DateFormat('EEEE, MMMM d, y').format(DateTime.now()),
-                  style: const TextStyle(
+                  DateFormat(isMobile ? 'MMM d, y' : 'EEEE, MMMM d, y').format(DateTime.now()),
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
+                    fontSize: isMobile ? 12 : 14,
                   ),
                 ),
               ],
@@ -265,64 +313,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
     int totalPausedMembers = sampleSubscriptions.where((s) => s.status == 'Paused').length;
     int upcomingExpiries = sampleSubscriptions.where((s) => s.isExpiringSoon).length;
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 5,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.5,
-      children: [
-        _buildKPICard(
-          'Active Members',
-          totalActiveMembers.toString(),
-          Iconsax.people,
-          Colors.green,
-          'Currently subscribed',
-        ),
-        _buildKPICard(
-          'Attendance Today',
-          totalAttendanceToday.toString(),
-          Iconsax.calendar_tick,
-          AppColors.yellow,
-          'Checked in',
-        ),
-        _buildKPICard(
-          'Expired Members',
-          totalExpiredMembers.toString(),
-          Iconsax.close_circle,
-          Colors.red,
-          'Need renewal',
-        ),
-        _buildKPICard(
-          'Paused Members',
-          totalPausedMembers.toString(),
-          Iconsax.pause,
-          Colors.orange,
-          'On hold',
-        ),
-        _buildKPICard(
-          'Upcoming Expiries',
-          upcomingExpiries.toString(),
-          Iconsax.warning_2,
-          Colors.blue,
-          'Within 7 days',
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 5;
+        double childAspectRatio = 1.45;
+        if (constraints.maxWidth < 600) {
+          crossAxisCount = 2;
+          childAspectRatio = 1.25;
+        } else if (constraints.maxWidth < 1000) {
+          crossAxisCount = 3;
+          childAspectRatio = 1.35;
+        }
+
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: childAspectRatio,
+          children: [
+            _buildKPICard(
+              'Active Members',
+              totalActiveMembers.toString(),
+              Iconsax.people,
+              Colors.green,
+              'Subscribed',
+            ),
+            _buildKPICard(
+              'Attendance Today',
+              totalAttendanceToday.toString(),
+              Iconsax.calendar_tick,
+              AppColors.yellow,
+              'Checked in',
+            ),
+            _buildKPICard(
+              'Expired Members',
+              totalExpiredMembers.toString(),
+              Iconsax.close_circle,
+              Colors.red,
+              'Need renewal',
+            ),
+            _buildKPICard(
+              'Paused Members',
+              totalPausedMembers.toString(),
+              Iconsax.pause,
+              Colors.orange,
+              'On hold',
+            ),
+            _buildKPICard(
+              'Upcoming Expiries',
+              upcomingExpiries.toString(),
+              Iconsax.warning_2,
+              Colors.blue,
+              'Within 7 days',
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildKPICard(String label, String value, IconData icon, Color color, String subtitle) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -334,33 +396,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: color, size: 20),
+                child: Icon(icon, color: color, size: 18),
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const Spacer(),
           Text(
             label,
             style: const TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 13,
+              fontSize: 12,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           Text(
             subtitle,
-            style: AppTextStyles.smallText.copyWith(fontSize: 11),
+            style: AppTextStyles.smallText.copyWith(fontSize: 10),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

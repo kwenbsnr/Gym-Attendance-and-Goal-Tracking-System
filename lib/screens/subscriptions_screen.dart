@@ -50,26 +50,31 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
   }
 
   Widget _buildAppBar() {
+    final isMobile = MediaQuery.of(context).size.width < 768;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 12 : 16),
       color: AppColors.white,
-      child: const Row(
+      child: Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Subscriptions',
-                style: AppTextStyles.heading2,
-              ),
-              Text(
-                'Manage memberships and renewals',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Subscriptions',
+                  style: isMobile ? AppTextStyles.heading3 : AppTextStyles.heading2,
                 ),
-              ),
-            ],
+                Text(
+                  'Manage memberships and renewals',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -84,47 +89,54 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
     int expiredCount = sampleSubscriptions.where((s) => s.status == 'Expired').length;
     int pausedCount = sampleSubscriptions.where((s) => s.status == 'Paused').length;
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.5,
-      children: [
-        _buildCategoryCard(
-          'Active Subscriptions',
-          activeCount.toString(),
-          Iconsax.tick_circle,
-          Colors.green,
-          'Currently active',
-          'Active',
-        ),
-        _buildCategoryCard(
-          'Expiring Soon',
-          expiringCount.toString(),
-          Iconsax.warning_2,
-          Colors.orange,
-          'Within 5 days',
-          'Expiring Soon',
-        ),
-        _buildCategoryCard(
-          'Expired Subscriptions',
-          expiredCount.toString(),
-          Iconsax.close_circle,
-          Colors.red,
-          'Needs renewal',
-          'Expired',
-        ),
-        _buildCategoryCard(
-          'Paused Subscriptions',
-          pausedCount.toString(),
-          Iconsax.pause,
-          Colors.blue,
-          'On hold',
-          'Paused',
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth < 650 ? 2 : 4;
+        final childAspectRatio = constraints.maxWidth < 650 ? 1.4 : 1.5;
+
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: childAspectRatio,
+          children: [
+            _buildCategoryCard(
+              'Active Subs',
+              activeCount.toString(),
+              Iconsax.tick_circle,
+              Colors.green,
+              'Currently active',
+              'Active',
+            ),
+            _buildCategoryCard(
+              'Expiring Soon',
+              expiringCount.toString(),
+              Iconsax.warning_2,
+              Colors.orange,
+              'Within 5 days',
+              'Expiring Soon',
+            ),
+            _buildCategoryCard(
+              'Expired Subs',
+              expiredCount.toString(),
+              Iconsax.close_circle,
+              Colors.red,
+              'Needs renewal',
+              'Expired',
+            ),
+            _buildCategoryCard(
+              'Paused Subs',
+              pausedCount.toString(),
+              Iconsax.pause,
+              Colors.blue,
+              'On hold',
+              'Paused',
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -136,7 +148,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
@@ -149,7 +161,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
+              blurRadius: 8,
               offset: const Offset(0, 2),
             ),
           ],
@@ -162,33 +174,40 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: AppColors.withOpacity(color, 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: Icon(icon, color: color, size: 18),
                 ),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               label,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
-                fontSize: 13,
+                fontSize: 12,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               subtitle,
-              style: AppTextStyles.smallText.copyWith(fontSize: 11),
+              style: AppTextStyles.smallText.copyWith(fontSize: 10),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -200,6 +219,7 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
 
   Widget _buildCategoryDetails() {
     List<ClientSubscription> filteredSubs = _getFilteredSubscriptions();
+    final isMobile = MediaQuery.of(context).size.width < 768;
     
     if (filteredSubs.isEmpty) {
       return Container(
@@ -224,6 +244,47 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
             ],
           ),
         ),
+      );
+    }
+
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '$_selectedCategory Subscriptions',
+                style: AppTextStyles.heading3,
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.yellow,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '${filteredSubs.length}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filteredSubs.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              return _buildMobileSubscriptionCard(filteredSubs[index]);
+            },
+          ),
+        ],
       );
     }
 
@@ -302,6 +363,124 @@ class _SubscriptionsScreenState extends State<SubscriptionsScreen> {
               return _buildSubscriptionListItem(filteredSubs[index]);
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileSubscriptionCard(ClientSubscription subscription) {
+    final client = sampleClients.firstWhere(
+      (c) => c.id == subscription.clientId,
+      orElse: () => sampleClients.first,
+    );
+    final plan = samplePlans.firstWhere(
+      (p) => p.id == subscription.planId,
+      orElse: () => samplePlans.first,
+    );
+    final planType = samplePlanTypes.firstWhere(
+      (t) => t.id == plan.planTypeId,
+      orElse: () => samplePlanTypes.first,
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.withOpacity(AppColors.yellow, 0.2),
+                child: Text(
+                  client.firstName.isNotEmpty ? client.firstName[0] : '?',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      client.fullName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      client.email,
+                      style: AppTextStyles.smallText.copyWith(fontSize: 11),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              _buildStatusChip(subscription.status),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Plan', style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                  const SizedBox(height: 2),
+                  Text('${planType.name} (${plan.name})', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('Duration', style: AppTextStyles.caption.copyWith(fontSize: 11)),
+                  const SizedBox(height: 2),
+                  Text(
+                    '${DateFormat('MMM d').format(subscription.startDate)} - ${DateFormat('MMM d, y').format(subscription.endDate)}',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          if (subscription.status == 'Active') ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  '${subscription.daysRemaining} days remaining',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: subscription.isExpiringSoon ? Colors.orange : Colors.green,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

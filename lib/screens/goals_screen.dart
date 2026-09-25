@@ -51,43 +51,48 @@ class _GoalsScreenState extends State<GoalsScreen> {
 
   Widget _buildAppBar() {
     int activeGoals = sampleClientGoals.where((g) => g.status == 'Ongoing').length;
+    final isMobile = MediaQuery.of(context).size.width < 768;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24, vertical: isMobile ? 12 : 16),
       color: AppColors.white,
       child: Row(
         children: [
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Goal Tracking',
-                style: AppTextStyles.heading2,
-              ),
-              Text(
-                'Monitor client fitness goals',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Goal Tracking',
+                  style: isMobile ? AppTextStyles.heading3 : AppTextStyles.heading2,
                 ),
-              ),
-            ],
+                Text(
+                  'Monitor client fitness goals',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 12, vertical: isMobile ? 6 : 8),
             decoration: BoxDecoration(
               color: AppColors.lightYellow,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Iconsax.activity, color: AppColors.black),
-                const SizedBox(width: 8),
+                Icon(Iconsax.activity, color: AppColors.black, size: isMobile ? 16 : 20),
+                const SizedBox(width: 6),
                 Text(
-                  '$activeGoals Active Goals',
-                  style: const TextStyle(
+                  '$activeGoals Active',
+                  style: TextStyle(
                     fontWeight: FontWeight.w500,
+                    fontSize: isMobile ? 12 : 14,
                   ),
                 ),
               ],
@@ -119,18 +124,32 @@ class _GoalsScreenState extends State<GoalsScreen> {
   // ============= GOAL CATEGORIES GRID (CARD FORMAT) =============
 
   Widget _buildGoalCategoriesGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.2,
-      ),
-      itemCount: sampleGoals.length,
-      itemBuilder: (context, index) {
-        return _buildGoalCategoryCard(sampleGoals[index]);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 3;
+        double childAspectRatio = 1.2;
+        if (constraints.maxWidth < 650) {
+          crossAxisCount = 1;
+          childAspectRatio = 1.5;
+        } else if (constraints.maxWidth < 1000) {
+          crossAxisCount = 2;
+          childAspectRatio = 1.25;
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: sampleGoals.length,
+          itemBuilder: (context, index) {
+            return _buildGoalCategoryCard(sampleGoals[index]);
+          },
+        );
       },
     );
   }
@@ -310,10 +329,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: Text(goal.goalName),
           content: Container(
-            width: 600,
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 600),
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -421,10 +442,12 @@ class _GoalsScreenState extends State<GoalsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
         return AlertDialog(
           title: const Text('Add New Goal Category'),
-          content: SizedBox(
-            width: 400,
+          content: Container(
+            width: screenWidth * 0.9,
+            constraints: const BoxConstraints(maxWidth: 400),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
