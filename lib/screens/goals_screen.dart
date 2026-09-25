@@ -127,13 +127,13 @@ class _GoalsScreenState extends State<GoalsScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount = 3;
-        double childAspectRatio = 1.2;
+        double childAspectRatio = 1.15;
         if (constraints.maxWidth < 650) {
           crossAxisCount = 1;
-          childAspectRatio = 1.5;
-        } else if (constraints.maxWidth < 1000) {
-          crossAxisCount = 2;
           childAspectRatio = 1.25;
+        } else if (constraints.maxWidth < 1050) {
+          crossAxisCount = 2;
+          childAspectRatio = 1.15;
         }
 
         return GridView.builder(
@@ -170,7 +170,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -178,10 +178,11 @@ class _GoalsScreenState extends State<GoalsScreen> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             // Card Header
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.withOpacity(AppColors.yellow, 0.1),
                 borderRadius: const BorderRadius.only(
@@ -192,7 +193,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -200,10 +201,10 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     child: Icon(
                       goal.icon,
                       color: AppColors.yellow,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,7 +213,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                           goal.goalName,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            fontSize: 15,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -220,6 +221,8 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         Text(
                           '$activeCount active • ${goalClients.length} total',
                           style: AppTextStyles.smallText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -230,7 +233,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
             
             // Card Body
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -240,7 +243,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 10),
                   
                   // Preview of clients with this goal
                   if (goalClients.isNotEmpty)
@@ -254,21 +257,21 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         );
                         
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.only(bottom: 6),
                           child: Row(
                             children: [
                               CircleAvatar(
-                                radius: 12,
+                                radius: 10,
                                 backgroundColor: AppColors.withOpacity(AppColors.yellow, 0.2),
                                 child: Text(
                                   client.firstName[0],
                                   style: const TextStyle(
-                                    fontSize: 10,
+                                    fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   client.fullName,
@@ -277,6 +280,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              const SizedBox(width: 4),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
@@ -304,7 +308,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                   
                   if (goalClients.length > 2)
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Text(
                         '+${goalClients.length - 2} more clients',
                         style: AppTextStyles.smallText.copyWith(fontSize: 11),
