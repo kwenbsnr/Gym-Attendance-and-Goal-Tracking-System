@@ -10,6 +10,7 @@ import 'package:flutter_application_try_0/models/subscription.dart';
 import 'package:flutter_application_try_0/screens/clients_screen.dart';
 import 'package:flutter_application_try_0/screens/goals_screen.dart';
 import 'package:flutter_application_try_0/screens/subscriptions_screen.dart';
+import 'package:flutter_application_try_0/screens/login_screen.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -130,9 +131,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                setState(() {
-                  _selectedIndex = 0;
-                });
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Logged out successfully'),
