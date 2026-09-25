@@ -575,59 +575,72 @@ class _ClientsScreenState extends State<ClientsScreen> {
   }
 
   Widget _buildTableFormat(List<Client> clients) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const minTableWidth = 850.0;
+        final tableWidth = constraints.maxWidth > minTableWidth ? constraints.maxWidth : minTableWidth;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Table Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: AppColors.grey,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: tableWidth,
+              child: Column(
+                children: [
+                  // Table Header
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    decoration: const BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        _buildHeaderCell('Client Name', flex: 2),
+                        _buildHeaderCell('Last Check-In', flex: 1.2),
+                        _buildHeaderCell('Last Check-Out', flex: 1.2),
+                        _buildHeaderCell('Subscription Status', flex: 1.1),
+                        _buildHeaderCell('Actions', flex: 1.5),
+                      ],
+                    ),
+                  ),
+                  
+                  // Table Body
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: clients.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      return _buildTableRow(clients[index]);
+                    },
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                _buildHeaderCell('Client Name', flex: 2),
-                _buildHeaderCell('Last Check-In'),
-                _buildHeaderCell('Last Check-Out'),
-                _buildHeaderCell('Subscription Status'),
-                _buildHeaderCell('Actions', flex: 2),
-              ],
-            ),
           ),
-          
-          // Table Body
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: clients.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              return _buildTableRow(clients[index]);
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildHeaderCell(String label, {double flex = 1}) {
     return Expanded(
-      flex: flex ~/ 1,
+      flex: (flex * 10).toInt(),
       child: Text(
         label,
         style: const TextStyle(
@@ -663,16 +676,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
     );
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           // Client Name
           Expanded(
-            flex: 2,
+            flex: 20,
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 20,
+                  radius: 18,
                   backgroundColor: AppColors.yellow.withValues(alpha: 0.2),
                   child: Text(
                     client.firstName[0],
@@ -693,10 +706,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         client.email,
                         style: AppTextStyles.smallText,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -707,17 +724,22 @@ class _ClientsScreenState extends State<ClientsScreen> {
           
           // Last Check-In
           Expanded(
+            flex: 12,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   lastAttendance?.formattedCheckInTime ?? 'Not checked in',
                   style: const TextStyle(fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (lastAttendance != null)
                   Text(
                     DateFormat('MMM d, y').format(lastAttendance.attendanceDate),
                     style: AppTextStyles.smallText.copyWith(fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
               ],
             ),
@@ -725,17 +747,22 @@ class _ClientsScreenState extends State<ClientsScreen> {
           
           // Last Check-Out
           Expanded(
+            flex: 12,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   lastAttendance?.formattedCheckOutTime ?? 'Not checked out',
                   style: const TextStyle(fontSize: 13),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (lastAttendance?.checkOutTime != null)
                   Text(
                     'Duration: ${lastAttendance!.formattedDuration}',
                     style: AppTextStyles.smallText.copyWith(fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
               ],
             ),
@@ -743,13 +770,18 @@ class _ClientsScreenState extends State<ClientsScreen> {
           
           // Subscription Status
           Expanded(
-            child: _buildStatusChip(sub.status),
+            flex: 11,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _buildStatusChip(sub.status),
+            ),
           ),
           
           // Actions
           Expanded(
-            flex: 2,
+            flex: 15,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // Check In Button
                 if (sub.status == 'Active')
@@ -758,6 +790,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     color: Colors.green,
                     onPressed: () => _showCheckInDialog(client),
                     tooltip: 'Check In',
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(6),
                   ),
                 
                 // Check Out Button
@@ -767,6 +801,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     color: Colors.blue,
                     onPressed: () => _showCheckOutDialog(client),
                     tooltip: 'Check Out',
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(6),
                   ),
                 
                 // Add Goal Button
@@ -775,14 +811,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   color: AppColors.yellow,
                   onPressed: () => _showAddGoalDialog(client),
                   tooltip: 'Add Goal',
-                ),
-                
-                // View Goals Button
-                IconButton(
-                  icon: const Icon(Iconsax.activity, size: 18),
-                  color: Colors.orange,
-                  onPressed: () => _showViewGoalsDialog(client),
-                  tooltip: 'View Goals',
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(6),
                 ),
                 
                 // View Details Button
@@ -791,22 +821,57 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   color: Colors.grey,
                   onPressed: () => _showClientDetails(client),
                   tooltip: 'View Details',
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(6),
                 ),
                 
-                // Edit Button
-                IconButton(
-                  icon: const Icon(Iconsax.edit, size: 18),
-                  color: Colors.blue,
-                  onPressed: () => _showClientForm(client: client),
-                  tooltip: 'Edit Client',
-                ),
-                
-                // Delete Button
-                IconButton(
-                  icon: const Icon(Iconsax.trash, size: 18),
-                  color: Colors.red,
-                  onPressed: () => _showDeleteConfirmation(client),
-                  tooltip: 'Delete Client',
+                // More Actions Menu
+                PopupMenuButton<String>(
+                  icon: const Icon(Iconsax.more, size: 18, color: Colors.grey),
+                  tooltip: 'More actions',
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(6),
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'view_goals',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.activity, size: 16, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text('View Goals'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.edit, size: 16, color: Colors.blue),
+                          SizedBox(width: 8),
+                          Text('Edit Client'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Iconsax.trash, size: 16, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Delete Client', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                  onSelected: (value) {
+                    if (value == 'view_goals') {
+                      _showViewGoalsDialog(client);
+                    } else if (value == 'edit') {
+                      _showClientForm(client: client);
+                    } else if (value == 'delete') {
+                      _showDeleteConfirmation(client);
+                    }
+                  },
                 ),
               ],
             ),
@@ -820,13 +885,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount = 3;
-        double childAspectRatio = 1.1;
+        double childAspectRatio = 1.15;
         if (constraints.maxWidth < 650) {
           crossAxisCount = 1;
-          childAspectRatio = 1.55;
+          childAspectRatio = 1.35;
         } else if (constraints.maxWidth < 1050) {
           crossAxisCount = 2;
-          childAspectRatio = 1.25;
+          childAspectRatio = 1.2;
         }
 
         return GridView.builder(
